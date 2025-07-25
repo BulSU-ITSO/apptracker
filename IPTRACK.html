@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Tracking Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">IP</span>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-900">BulSU-ITSO IP Application Tracker</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="userControls" class="hidden flex items-center space-x-4">
+                        <div class="flex bg-gray-100 rounded-lg p-1">
+                            <button id="adminBtn" class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900">Admin</button>
+                            <button id="applicantBtn" class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900">Applicant</button>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span id="currentUserName" class="font-medium"></span>
+                        </div>
+                        <button id="logoutBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-all duration-200">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="mainContent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden">
+        <!-- Admin Panel -->
+        <div id="adminPanel" class="space-y-6">
+            <!-- Add New Application Form -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                    <span class="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                    Add New IP Application
+                </h2>
+                <form id="addApplicationForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                        <input type="text" id="titleInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Enter IP title" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Reference Number</label>
+                        <input type="text" id="refNumberInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Enter reference number" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">IP Type</label>
+                        <select id="ipTypeInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" required>
+                            <option value="">Select IP Type</option>
+                            <option value="Patent">Patent</option>
+                            <option value="Utility Model">Utility Model</option>
+                            <option value="Industrial Design">Industrial Design</option>
+                            <option value="Trademark">Trademark</option>
+                            <option value="Copyright">Copyright</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select id="statusInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" required>
+                            <option value="">Select Status</option>
+                            <option value="Documents Submitted">Documents Submitted</option>
+                            <option value="IPOPHL Filed">IPOPHL Filed</option>
+                            <option value="IPOPHL Ongoing">IPOPHL Ongoing</option>
+                            <option value="IPOPHL Published">IPOPHL Published</option>
+                            <option value="Requested for COR">Requested for COR</option>
+                            <option value="IPOPHL Registered">IPOPHL Registered</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Applicant Name</label>
+                        <input type="text" id="applicantInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Enter applicant name" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Assign to User</label>
+                        <select id="applicantUserInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" required>
+                            <option value="">Select User</option>
+                            <option value="admin">Admin</option>
+                            <option value="applicant">Applicant</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+                        <input type="text" id="remarksInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Optional remarks">
+                    </div>
+                    <div class="md:col-span-2 lg:col-span-3">
+                        <button type="submit" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+                            Add Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Filter and Search -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filter by IP Type</label>
+                        <select id="filterType" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">All Types</option>
+                            <option value="Patent">Patent</option>
+                            <option value="Utility Model">Utility Model</option>
+                            <option value="Industrial Design">Industrial Design</option>
+                            <option value="Trademark">Trademark</option>
+                            <option value="Copyright">Copyright</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Status</label>
+                        <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">All Statuses</option>
+                            <option value="Documents Submitted">Documents Submitted</option>
+                            <option value="IPOPHL Filed">IPOPHL Filed</option>
+                            <option value="IPOPHL Ongoing">IPOPHL Ongoing</option>
+                            <option value="IPOPHL Published">IPOPHL Published</option>
+                            <option value="Requested for COR">Requested for COR</option>
+                            <option value="IPOPHL Registered">IPOPHL Registered</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                        <input type="text" id="searchInput" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Search by title or reference">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applicant Panel -->
+        <div id="applicantPanel" class="hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 mb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                    My Applications
+                </h2>
+                <div class="flex gap-4 items-center">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Search My Applications</label>
+                        <input type="text" id="applicantSearch" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Search by title or reference">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Applicant Applications Cards -->
+            <div id="applicantApplications" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Applications will be populated here as cards -->
+            </div>
+        </div>
+
+        <!-- Applications Table (Admin Only) -->
+        <div id="applicationsTableContainer" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                    <span class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></span>
+                    IP Applications
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Type</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Progress</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remarks</th>
+                            <th id="actionsHeader" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationsTable" class="bg-white divide-y divide-gray-200">
+                        <!-- Applications will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit Application</h3>
+            <form id="editForm" class="space-y-4">
+                <input type="hidden" id="editId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                    <input type="text" id="editTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Reference Number</label>
+                    <input type="text" id="editRefNumber" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">IP Type</label>
+                    <select id="editIpType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <option value="Patent">Patent</option>
+                        <option value="Utility Model">Utility Model</option>
+                        <option value="Industrial Design">Industrial Design</option>
+                        <option value="Trademark">Trademark</option>
+                        <option value="Copyright">Copyright</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="editStatus" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <option value="Documents Submitted">Documents Submitted</option>
+                        <option value="IPOPHL Filed">IPOPHL Filed</option>
+                        <option value="IPOPHL Ongoing">IPOPHL Ongoing</option>
+                        <option value="IPOPHL Published">IPOPHL Published</option>
+                        <option value="Requested for COR">Requested for COR</option>
+                        <option value="IPOPHL Registered">IPOPHL Registered</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Applicant Name</label>
+                    <input type="text" id="editApplicant" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Assign to User</label>
+                    <select id="editApplicantUser" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <option value="admin">Admin</option>
+                        <option value="applicant">Applicant</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+                    <input type="text" id="editRemarks" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200">
+                        Update
+                    </button>
+                    <button type="button" id="cancelEdit" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-400 transition-all duration-200">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md mx-4">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-white font-bold text-2xl">IP</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">BulSU-ITSO Login</h2>
+                <p class="text-gray-600 mt-2">Please sign in to access the system</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="loginUsername" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Enter username" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" placeholder="Enter password" required>
+                </div>
+                <div id="loginError" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 class="text-sm font-medium text-gray-900 mb-2">Demo Credentials:</h3>
+                <div class="text-xs text-gray-600 space-y-1">
+                    <div><strong>Admin:</strong> admin / admin123</div>
+                    <div><strong>Applicant:</strong> applicant / app123</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User credentials (in production, this would be handled server-side)
+        const users = {
+            'admin': {
+                password: 'admin123',
+                role: 'admin',
+                name: 'Admin User'
+            },
+            'applicant': {
+                password: 'app123',
+                role: 'applicant',
+                name: 'Applicant User'
+            }
+        };
+
+        // Session management
+        let currentUser = null;
+        let isLoggedIn = false;
+
+        // Application data storage with localStorage persistence
+        function loadApplicationsFromStorage() {
+            const stored = localStorage.getItem('ipApplications');
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            // Default sample data if nothing in storage
+            return [
+                {
+                    id: 1,
+                    title: "Smart Home Security System",
+                    refNumber: "PAT-2024-001",
+                    ipType: "Patent",
+                    status: "IPOPHL Ongoing",
+                    applicant: "John Smith",
+                    applicantUser: "applicant",
+                    remarks: "Awaiting examiner review"
+                },
+                {
+                    id: 2,
+                    title: "EcoFriendly Logo Design",
+                    refNumber: "TM-2024-002",
+                    ipType: "Trademark",
+                    status: "IPOPHL Published",
+                    applicant: "Green Corp",
+                    applicantUser: "applicant",
+                    remarks: "Publication period active"
+                },
+                {
+                    id: 3,
+                    title: "Innovative Chair Design",
+                    refNumber: "ID-2024-003",
+                    ipType: "Industrial Design",
+                    status: "IPOPHL Registered",
+                    applicant: "Design Studio Inc",
+                    applicantUser: "admin",
+                    remarks: "Registration complete"
+                },
+                {
+                    id: 4,
+                    title: "Mobile App Patent",
+                    refNumber: "PAT-2024-004",
+                    ipType: "Patent",
+                    status: "Documents Submitted",
+                    applicant: "Tech Solutions",
+                    applicantUser: "applicant",
+                    remarks: "Initial submission complete"
+                }
+            ];
+        }
+
+        function saveApplicationsToStorage() {
+            localStorage.setItem('ipApplications', JSON.stringify(applications));
+            localStorage.setItem('nextId', nextId.toString());
+        }
+
+        function loadNextIdFromStorage() {
+            const stored = localStorage.getItem('nextId');
+            return stored ? parseInt(stored) : 5;
+        }
+
+        let applications = loadApplicationsFromStorage();
+        let nextId = loadNextIdFromStorage();
+
+        // Status progression system
+        const statusProgression = [
+            'Documents Submitted',
+            'IPOPHL Filed',
+            'IPOPHL Ongoing',
+            'IPOPHL Published',
+            'Requested for COR',
+            'IPOPHL Registered'
+        ];
+
+        // Status color mapping
+        const statusColors = {
+            'Documents Submitted': 'bg-yellow-100 text-yellow-800',
+            'IPOPHL Filed': 'bg-blue-100 text-blue-800',
+            'IPOPHL Ongoing': 'bg-orange-100 text-orange-800',
+            'IPOPHL Published': 'bg-purple-100 text-purple-800',
+            'Requested for COR': 'bg-indigo-100 text-indigo-800',
+            'IPOPHL Registered': 'bg-green-100 text-green-800'
+        };
+
+        // Function to create status progress dots
+        function createStatusProgress(currentStatus) {
+            const currentIndex = statusProgression.indexOf(currentStatus);
+            
+            return `
+                <div class="flex flex-col space-y-2">
+                    <div class="flex items-center space-x-2">
+                        ${statusProgression.map((status, index) => {
+                            const isCompleted = index <= currentIndex;
+                            const isCurrent = index === currentIndex;
+                            
+                            return `
+                                <div class="flex flex-col items-center">
+                                    <div class="w-3 h-3 rounded-full ${isCompleted ? 'bg-blue-600' : 'bg-gray-300'} ${isCurrent ? 'ring-2 ring-blue-300' : ''}"></div>
+                                    ${index < statusProgression.length - 1 ? '<div class="w-8 h-0.5 bg-gray-300 mt-1.5"></div>' : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="text-xs text-gray-600 font-medium">${currentStatus}</div>
+                </div>
+            `;
+        }
+
+        // IP Type color mapping
+        const ipTypeColors = {
+            'Patent': 'bg-red-100 text-red-800',
+            'Utility Model': 'bg-blue-100 text-blue-800',
+            'Industrial Design': 'bg-green-100 text-green-800',
+            'Trademark': 'bg-purple-100 text-purple-800',
+            'Copyright': 'bg-orange-100 text-orange-800'
+        };
+
+        // DOM elements
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const mainContent = document.getElementById('mainContent');
+        const userControls = document.getElementById('userControls');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminBtn = document.getElementById('adminBtn');
+        const applicantBtn = document.getElementById('applicantBtn');
+        const adminPanel = document.getElementById('adminPanel');
+        const applicantPanel = document.getElementById('applicantPanel');
+        const currentUserName = document.getElementById('currentUserName');
+        const actionsHeader = document.getElementById('actionsHeader');
+        const addApplicationForm = document.getElementById('addApplicationForm');
+        const applicationsTable = document.getElementById('applicationsTable');
+        const applicationsTableContainer = document.getElementById('applicationsTableContainer');
+        const applicantApplications = document.getElementById('applicantApplications');
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+        const cancelEdit = document.getElementById('cancelEdit');
+
+        // Login functionality
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (users[username] && users[username].password === password) {
+                // Successful login
+                currentUser = users[username];
+                isLoggedIn = true;
+                
+                // Hide login modal and show main content
+                loginModal.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                userControls.classList.remove('hidden');
+                userControls.classList.add('flex');
+                
+                // Set user interface based on role
+                switchUser(currentUser.role);
+                
+                // Clear login form
+                loginForm.reset();
+                loginError.classList.add('hidden');
+            } else {
+                // Failed login
+                loginError.textContent = 'Invalid username or password';
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // Logout functionality
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            isLoggedIn = false;
+            
+            // Show login modal and hide main content
+            loginModal.classList.remove('hidden');
+            mainContent.classList.add('hidden');
+            userControls.classList.add('hidden');
+            userControls.classList.remove('flex');
+            
+            // Clear any error messages
+            loginError.classList.add('hidden');
+        });
+
+        // User switching (only available to admin users)
+        adminBtn.addEventListener('click', () => {
+            if (currentUser && currentUser.role === 'admin') {
+                switchUser('admin');
+            }
+        });
+        
+        applicantBtn.addEventListener('click', () => {
+            if (currentUser && currentUser.role === 'admin') {
+                switchUser('applicant');
+            }
+        });
+
+        function switchUser(userType) {
+            // Only admin users can switch between views
+            if (currentUser && currentUser.role !== 'admin' && userType !== currentUser.role) {
+                return;
+            }
+            
+            if (userType === 'admin') {
+                adminBtn.className = 'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 bg-blue-600 text-white';
+                applicantBtn.className = 'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900';
+                adminPanel.classList.remove('hidden');
+                applicantPanel.classList.add('hidden');
+                applicationsTableContainer.classList.remove('hidden');
+                currentUserName.textContent = currentUser ? currentUser.name : 'Admin User';
+                actionsHeader.classList.remove('hidden');
+                
+                // Show/hide user switching buttons based on role
+                if (currentUser && currentUser.role === 'admin') {
+                    adminBtn.style.display = 'block';
+                    applicantBtn.style.display = 'block';
+                }
+            } else {
+                applicantBtn.className = 'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 bg-blue-600 text-white';
+                adminBtn.className = 'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900';
+                adminPanel.classList.add('hidden');
+                applicantPanel.classList.remove('hidden');
+                applicationsTableContainer.classList.add('hidden');
+                currentUserName.textContent = currentUser ? currentUser.name : 'Applicant User';
+                actionsHeader.classList.add('hidden');
+                
+                // Hide user switching buttons for regular applicants
+                if (currentUser && currentUser.role === 'applicant') {
+                    adminBtn.style.display = 'none';
+                    applicantBtn.style.display = 'none';
+                }
+            }
+            
+            renderApplications();
+        }
+
+        // Add new application (admin only)
+        addApplicationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Security check: only admin can add applications
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Access denied. Only administrators can add applications.');
+                return;
+            }
+            
+            const newApplication = {
+                id: nextId++,
+                title: document.getElementById('titleInput').value,
+                refNumber: document.getElementById('refNumberInput').value,
+                ipType: document.getElementById('ipTypeInput').value,
+                status: document.getElementById('statusInput').value,
+                applicant: document.getElementById('applicantInput').value,
+                applicantUser: document.getElementById('applicantUserInput').value,
+                remarks: document.getElementById('remarksInput').value
+            };
+            
+            applications.push(newApplication);
+            saveApplicationsToStorage();
+            addApplicationForm.reset();
+            renderApplications();
+        });
+
+        // Edit application (admin only)
+        function editApplication(id) {
+            // Security check: only admin can edit applications
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Access denied. Only administrators can edit applications.');
+                return;
+            }
+            
+            const app = applications.find(a => a.id === id);
+            if (!app) return;
+            
+            document.getElementById('editId').value = app.id;
+            document.getElementById('editTitle').value = app.title;
+            document.getElementById('editRefNumber').value = app.refNumber;
+            document.getElementById('editIpType').value = app.ipType;
+            document.getElementById('editStatus').value = app.status;
+            document.getElementById('editApplicant').value = app.applicant;
+            document.getElementById('editApplicantUser').value = app.applicantUser;
+            document.getElementById('editRemarks').value = app.remarks;
+            
+            editModal.classList.remove('hidden');
+            editModal.classList.add('flex');
+        }
+
+        // Update application (admin only)
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Security check: only admin can update applications
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Access denied. Only administrators can update applications.');
+                return;
+            }
+            
+            const id = parseInt(document.getElementById('editId').value);
+            const appIndex = applications.findIndex(a => a.id === id);
+            
+            if (appIndex !== -1) {
+                applications[appIndex] = {
+                    id: id,
+                    title: document.getElementById('editTitle').value,
+                    refNumber: document.getElementById('editRefNumber').value,
+                    ipType: document.getElementById('editIpType').value,
+                    status: document.getElementById('editStatus').value,
+                    applicant: document.getElementById('editApplicant').value,
+                    applicantUser: document.getElementById('editApplicantUser').value,
+                    remarks: document.getElementById('editRemarks').value
+                };
+                
+                saveApplicationsToStorage();
+                closeEditModal();
+                renderApplications();
+            }
+        });
+
+        // Delete application (admin only)
+        function deleteApplication(id) {
+            // Security check: only admin can delete applications
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Access denied. Only administrators can delete applications.');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this application?')) {
+                applications = applications.filter(a => a.id !== id);
+                saveApplicationsToStorage();
+                renderApplications();
+            }
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            editModal.classList.add('hidden');
+            editModal.classList.remove('flex');
+        }
+
+        cancelEdit.addEventListener('click', closeEditModal);
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) closeEditModal();
+        });
+
+        // Filter and search functionality
+        document.getElementById('filterType').addEventListener('change', renderApplications);
+        document.getElementById('filterStatus').addEventListener('change', renderApplications);
+        document.getElementById('searchInput').addEventListener('input', renderApplications);
+        document.getElementById('applicantSearch').addEventListener('input', renderApplications);
+
+        // Render applications table or cards
+        function renderApplications() {
+            let filteredApps = [...applications];
+            
+            // Apply filters for admin
+            if (currentUser && currentUser.role === 'admin') {
+                const typeFilter = document.getElementById('filterType').value;
+                const statusFilter = document.getElementById('filterStatus').value;
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                
+                if (typeFilter) {
+                    filteredApps = filteredApps.filter(app => app.ipType === typeFilter);
+                }
+                
+                if (statusFilter) {
+                    filteredApps = filteredApps.filter(app => app.status === statusFilter);
+                }
+                
+                if (searchTerm) {
+                    filteredApps = filteredApps.filter(app => 
+                        app.title.toLowerCase().includes(searchTerm) ||
+                        app.refNumber.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                // Render admin table
+                applicationsTable.innerHTML = filteredApps.map(app => `
+                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${app.title}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 font-mono">${app.refNumber}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${ipTypeColors[app.ipType]}">${app.ipType}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            ${createStatusProgress(app.status)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${app.applicant}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">${app.remarks || '-'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button onclick="editApplication(${app.id})" class="text-blue-600 hover:text-blue-900 mr-3 transition-colors duration-150">Edit</button>
+                            <button onclick="deleteApplication(${app.id})" class="text-red-600 hover:text-red-900 transition-colors duration-150">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } else if (currentUser && currentUser.role === 'applicant') {
+                // For applicant, show only applications assigned to the current logged-in user
+                filteredApps = filteredApps.filter(app => app.applicantUser === currentUser.username || app.applicantUser === 'applicant');
+                
+                const searchTerm = document.getElementById('applicantSearch').value.toLowerCase();
+                
+                if (searchTerm) {
+                    filteredApps = filteredApps.filter(app => 
+                        app.title.toLowerCase().includes(searchTerm) ||
+                        app.refNumber.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                // Render applicant cards only if there are matching applications
+                if (filteredApps.length > 0) {
+                    applicantApplications.innerHTML = filteredApps.map(app => `
+                        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-200">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">${app.title}</h3>
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${ipTypeColors[app.ipType]}">${app.ipType}</span>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-500">Reference:</span>
+                                    <span class="text-sm text-gray-900 font-mono ml-2">${app.refNumber}</span>
+                                </div>
+                                
+                                <div>
+                                    <span class="text-sm font-medium text-gray-500">Applicant:</span>
+                                    <span class="text-sm text-gray-900 ml-2">${app.applicant}</span>
+                                </div>
+                                
+                                <div>
+                                    <span class="text-sm font-medium text-gray-500 block mb-2">Status Progress:</span>
+                                    ${createStatusProgress(app.status)}
+                                </div>
+                                
+                                ${app.remarks ? `
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-500">Remarks:</span>
+                                        <span class="text-sm text-gray-700 ml-2">${app.remarks}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    // Show message when no applications are found
+                    applicantApplications.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <div class="text-gray-400 text-lg mb-2">📋</div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No Applications Found</h3>
+                            <p class="text-gray-500">You don't have any applications assigned to you yet.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Initialize app - show login screen first
+        function initializeApp() {
+            // Show login modal on startup
+            loginModal.classList.remove('hidden');
+            mainContent.classList.add('hidden');
+            userControls.classList.add('hidden');
+        }
+
+        // Initial render
+        initializeApp();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9647dc0bf48d472e',t:'MTc1MzQwNjY4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
